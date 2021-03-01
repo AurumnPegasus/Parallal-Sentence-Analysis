@@ -5,13 +5,36 @@ import matplotlib.patches as mpatches
 
 class Analysis:
 
+    '''
+        Explanation: The main code which is used to analyse give sentences and create graphs to aide analysis
+
+        Class Variables:
+            en: JSON object of English Data
+            hi: JSON object of Hindi Data
+            ENGLISH: Color allocated to English Data in Graphs
+            HINDI: Color allocated to Hindi Data in Graphs
+    '''
+
     def __init__(self, en, hi):
+        '''
+            Explanation: Initialisation function which is used to initialise the class variables.
+        '''
         self.en = en
         self.hi = hi
         self.ENGLISH = GREEN
         self.HINDI = PURPLE
 
     def get_ngram(self, data, n):
+        '''
+            Explanation: Function which returns a list of tuples of the form (frequency, pattern)
+
+            Parameters:
+                data: JSON object from which ngram needs to be derived
+                n: Value of n
+
+            Return:
+                Sorted list of tuples of the form (frequency, pattern), where pattern refers to ngram of POS tags
+        '''
         gram = {}
 
         for obj in data:
@@ -41,7 +64,17 @@ class Analysis:
         return sorted(temp, reverse=True)
 
     def unigram_graph(self, en, hi):
+        '''
+            Explanation: Used to draw a graph to compare how frequency of unigrams compare in different languages
+
+            Parameters:
+                en: Sorted list of tuples of the English Dataset
+                hi: Sorted list of tuples of the Hindo Dataset
+        '''
+
+        # Tags which I chose to compare based on significance
         tags = ['NOUN', 'PROPN', 'ADJ', 'VERB', 'ADP']
+
         y_eng = []
         y_hin = []
         
@@ -71,6 +104,15 @@ class Analysis:
         plt.savefig('graphs/unigram_POS.png')
     
     def ngram_graph(self, data, n, lang, threshold):
+        '''
+            Explanation: Function which grapsh frequency of occurances of particular patterns (ngrams)
+
+            Parameters:
+                data: Sorted list of tuples
+                n: Value of n in ngram
+                lang: The language used
+                threshold: The threshold value below which ngrams wont be considered
+        '''
 
         title = str(n) + 'gram POS, ' + lang
 
@@ -101,19 +143,34 @@ class Analysis:
         plt.savefig('graphs/' + title + '.png')
     
     def ngram(self):
+        '''
+            Explanation: Driver code for getting and graphing different ngrams from 1-3
+        '''
+        
         unigram_en = self.get_ngram(self.en, 1)
         unigram_hi = self.get_ngram(self.hi, 1)
         self.unigram_graph(unigram_en, unigram_hi)
+
         bigram_en = self.get_ngram(self.en, 2)
         bigram_hi = self.get_ngram(self.hi, 2)
         self.ngram_graph(bigram_en, 2, 'en', BIGRAM_THRESHOLD)
         self.ngram_graph(bigram_hi, 2, 'hi', BIGRAM_THRESHOLD)
+
         trigram_en = self.get_ngram(self.en, 3)
         trigram_hi = self.get_ngram(self.hi, 3)
         self.ngram_graph(trigram_en, 3, 'en', TRIGRAM_THRESHOLD)
         self.ngram_graph(trigram_hi, 3, 'hi', TRIGRAM_THRESHOLD)
 
     def get_order(self, data):
+        '''
+            Explanation: Function which calculates frequency of Word Order of the sentences
+
+            Parameters:
+                data: JSON object related to a particular language
+
+            Return:
+                Sorted list of tuples of the format (frequency, word_order)
+        '''
         wo = {}
 
         for obj in data:
@@ -132,6 +189,13 @@ class Analysis:
         return sorted(temp, reverse=True)
 
     def order_graph(self, data, lang):
+        '''
+            Explanation: Function which graphs Order VS Frequency
+
+            Parameters:
+                data: Sorted list of tuples of the form (frequency, word_order)
+                lang: The language of the dataset
+        '''
         wo = []
         y = []
         
@@ -157,13 +221,26 @@ class Analysis:
         plt.savefig('graphs/Word Order, ' + lang + '.png')
     
     def word_order(self):
+        '''
+            Explanation: Driver code to get the graphs related to word order
+        '''
         hi_order = self.get_order(self.hi)[:HI_ORDER]
         en_order = self.get_order(self.en)[:EN_ORDER]
         self.order_graph(hi_order, 'hi')
         self.order_graph(en_order, 'en')
     
     def get_position(self, data, heading, property):
+        '''
+            Explanation: Function to find occurance of propery before or after the head
 
+            Paramters:
+                data: JSON object related to a language
+                heading: The parameter we are supposed to check
+                property: The parameter it is supposed to be equal to 
+
+            Return:
+                List containing frequency of number of times it has occured before and after the occurances of head
+        '''
         after = 0
         before = 0
 
@@ -181,6 +258,15 @@ class Analysis:
         return [before, after]
     
     def position_graph(self, en, hi, x, title):
+        '''
+            Explanation: Function which graphs particular grammatical features order of occurance wrt its head and compares the langauges
+
+            Parameters:
+                en: List of frequency in English
+                hi: List of frequency in Hindi
+                x: X value of the graphs
+                title: Title of the graph
+        '''
         ind = np.arange(len(x))
         plt.figure(figsize=(10, 10))
         width = 0.3
@@ -197,6 +283,9 @@ class Analysis:
         plt.savefig('graphs/' + title + '.png')
     
     def position(self):
+        '''
+            Explanation: Driver code to get graphs of deeper syntactic analysis based on frequency of occurances
+        '''
         en_comp = self.get_position(self.en, 'relation', 'compound')
         hi_comp = self.get_position(self.hi, 'relation', 'compound')
         en_adp = self.get_position(self.en, 'pos', 'ADP')
@@ -208,6 +297,9 @@ class Analysis:
         self.position_graph(en_adj, hi_adj, ['Before', 'After'], "Noun Adjective Order")
     
     def drive(self):
+        '''
+            Driver code for all analysis
+        '''
         self.ngram()
         self.word_order()
         self.position()
