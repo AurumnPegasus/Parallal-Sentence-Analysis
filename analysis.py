@@ -292,9 +292,14 @@ class Analysis:
         hi_adp = self.get_position(self.hi, 'pos', 'ADP')
         en_adj = self.get_position(self.en, 'pos', 'ADJ')
         hi_adj = self.get_position(self.hi, 'pos', 'ADJ')
+        en_poss = self.get_position(self.en, 'relation', 'nmod:poss')
+        hi_poss = self.get_position(self.hi, 'relation', 'nmod:poss')
+        en_adv = self.get_position(self.en, 'relation', 'advcl')
+        hi_adv = self.get_position(self.hi, 'relation', 'advcl')
         self.position_graph(en_comp, hi_comp, ['Before', 'After'], "Position of Compound Relation")
         self.position_graph(en_adp, hi_adp, ['Preposition', 'Postposition'], "Position of Adposition")
         self.position_graph(en_adj, hi_adj, ['Before', 'After'], "Noun Adjective Order")
+        self.position_graph(en_adv, hi_adv, ['Before', 'After'], "Adverbial Clause")
     
     def drive(self):
         '''
